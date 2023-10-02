@@ -16,9 +16,9 @@ const addCartProducts = async (req, res) => {
           "Invalid input. Please provide an array of products with product ID and quantity.",
       });
     }
-    
+
     // Fetching prices for the products from the 'products' table
-    const productIds = products.map((product) => product.product_id);
+    const productIds = products.map((product) => product.productId);
     const productData = await db("products")
       .whereIn("id", productIds)
       .select("id", "price");
@@ -40,11 +40,11 @@ const addCartProducts = async (req, res) => {
     const validationErrors = [];
 
     for (const product of products) {
-      const { product_id, quantity } = product;
+      const { productId, quantity } = product;
 
       // Checking if required fields are provided for each product
-      if (!product_id) {
-        errors.product_id = "Product ID is required.";
+      if (!productId) {
+        errors.productId = "Product ID is required.";
       }
 
       // Checking if quantity is a valid positive integer
@@ -56,15 +56,15 @@ const addCartProducts = async (req, res) => {
         errors.quantity = "Quantity must be a valid positive integer.";
       }
 
-      const matchedProduct = productData.find((p) => p.id === product_id);
+      const matchedProduct = productData.find((p) => p.id === productId);
 
       if (!matchedProduct) {
-        validationErrors.push({ product_id, error: "Product not found." });
+        validationErrors.push({ productId, error: "Product not found." });
       } else {
-        const existingQuantity = existingCartQuantityMap[product_id] || 0;
+        const existingQuantity = existingCartQuantityMap[productId] || 0;
         const totalQuantity = existingQuantity + quantity;
         cartItems.push({
-          product_id,
+          product_id: productId,
           price: matchedProduct.price,
           quantity: totalQuantity, // Updating quantity by adding to the existing quantity
         });
@@ -152,7 +152,7 @@ const removeProduct = async (req, res) => {
         .update("quantity", remainingQuantity);
     }
 
-    res.status(200).send({ message: "cart item updated" }); 
+    res.status(200).send({ message: "cart item updated" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
