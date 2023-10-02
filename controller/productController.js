@@ -4,6 +4,7 @@ const knexConfig = require("../knexfile");
 // Initializing Knex with the configuration
 const db = knex(knexConfig.development);
 
+//to get all the products
 const getProducts = async (req, res) => {
   try {
     const products = await db("products").select("*");
@@ -14,6 +15,7 @@ const getProducts = async (req, res) => {
   }
 };
 
+//to add a product
 const addProducts = async (req, res) => {
   try {
     const { name, price } = req.body;
@@ -44,6 +46,7 @@ const addProducts = async (req, res) => {
   }
 };
 
+//to delete a product
 const deleteProducts = async (req, res) => {
   const productId = req.params.id;
 
