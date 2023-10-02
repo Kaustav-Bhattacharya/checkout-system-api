@@ -4,31 +4,31 @@ const knexConfig = require("../knexfile");
 // Initializing Knex with the configuration
 const db = knex(knexConfig.development);
 
-//add items to the cart
+//adding items to the cart
 const addCartProducts = async (req, res) => {
   try {
     const products = req.body;
 
-    // Check if products is an array
+    // Checking if products is an array
     if (!Array.isArray(products) || products.length === 0) {
       return res.status(400).json({
         error:
           "Invalid input. Please provide an array of products with product ID and quantity.",
       });
     }
-
-    // Fetch prices for the products from the 'products' table
+    
+    // Fetching prices for the products from the 'products' table
     const productIds = products.map((product) => product.product_id);
     const productData = await db("products")
       .whereIn("id", productIds)
       .select("id", "price");
 
-    // Fetch the existing cart items
+    // Fetching the existing cart items
     const existingCartItems = await db("cart")
       .whereIn("product_id", productIds)
       .select("product_id", "quantity");
 
-    // Create a mapping of product_id to existing quantity in the cart
+    // Creating a mapping of product_id to existing quantity in the cart
     const existingCartQuantityMap = {};
     for (const item of existingCartItems) {
       existingCartQuantityMap[item.product_id] = item.quantity;
@@ -36,18 +36,18 @@ const addCartProducts = async (req, res) => {
 
     const cartItems = [];
 
-    // Validate each product and build the cart items array
+    // Validating each product and build the cart items array
     const validationErrors = [];
 
     for (const product of products) {
       const { product_id, quantity } = product;
 
-      // Check if required fields are provided for each product
+      // Checking if required fields are provided for each product
       if (!product_id) {
         errors.product_id = "Product ID is required.";
       }
 
-      // Check if quantity is a valid positive integer
+      // Checking if quantity is a valid positive integer
       if (
         isNaN(quantity) ||
         !Number.isInteger(Number(quantity)) ||
@@ -66,7 +66,7 @@ const addCartProducts = async (req, res) => {
         cartItems.push({
           product_id,
           price: matchedProduct.price,
-          quantity: totalQuantity, // Update quantity by adding to the existing quantity
+          quantity: totalQuantity, // Updating quantity by adding to the existing quantity
         });
       }
     }
@@ -79,10 +79,10 @@ const addCartProducts = async (req, res) => {
       });
     }
 
-    // Remove existing cart items for products being updated
+    // Removing existing cart items for products being updated
     await db("cart").whereIn("product_id", productIds).del();
 
-    // Insert the updated products into the cart table
+    // Inserting the updated products into the cart table
     await db("cart").insert(cartItems);
 
     res.status(201).json({ message: "Products added to cart successfully." });
