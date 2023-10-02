@@ -7,7 +7,6 @@ exports.up = function (knex) {
     table.increments("id").primary();
     table.string("name");
     table.decimal("price", 8, 2);
-    // Add more columns as needed
     table.timestamps(true, true);
   });
 };
